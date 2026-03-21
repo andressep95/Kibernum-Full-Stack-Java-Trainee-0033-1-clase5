@@ -8,6 +8,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import org.springframework.data.jpa.repository.Query;
+
 import java.util.HashSet;
 import java.util.Set;
 

@@ -5,7 +5,7 @@
 - Escenario 1: Libro con autor usado anteriormente.
 - Escenario 2: Libro con autor nuevo.
 - Escenario 3: Libro con autor desconocido.
-- Escenario 4: Libro con autores multiples.
+- Escenario 4: Libro con autores multiples. [X]
 
 ---
 
@@ -65,4 +65,3 @@
 - Escenario 2: Consulta por usuario.
 - Escenario 3: Consulta por libro.
 - Escenario 4: Consulta por fecha de prestamo (recientes o no recientes).
-- 
