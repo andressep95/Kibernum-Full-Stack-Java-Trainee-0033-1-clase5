@@ -14,6 +14,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -36,6 +37,7 @@ public class LibroServiceImpl implements LibroService {
     */
 
     @Override
+    @Transactional
     public void crearLibro(CreateLibroDTO createLibroDTO) {
         // Validamos datos propios del libro
         validarCrearLibro(createLibroDTO);
@@ -59,6 +61,7 @@ public class LibroServiceImpl implements LibroService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<ListLibroDTO> obtenerLibros(Integer page, Integer size) {
         if (page == null || page < 0) {
             throw new IllegalArgumentException("El número de página no puede ser nulo o negativo");

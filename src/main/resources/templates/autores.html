@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Biblioteca - Usuarios</title>
+    <title>Biblioteca - Autores</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
     <style>
@@ -29,18 +29,14 @@
             font-family: 'Segoe UI', system-ui, sans-serif;
         }
 
-        .wrapper {
-            display: flex;
-            min-height: 100vh;
-        }
+        .wrapper { display: flex; min-height: 100vh; }
 
         /* ── Sidebar ── */
         .sidebar {
             width: var(--sidebar-collapsed);
             background: var(--sidebar-bg);
             position: fixed;
-            top: 0;
-            left: 0;
+            top: 0; left: 0;
             height: 100vh;
             overflow: hidden;
             z-index: 1000;
@@ -53,7 +49,7 @@
             align-items: center;
             padding: 0 18px;
             height: 68px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+            border-bottom: 1px solid rgba(255,255,255,0.07);
             flex-shrink: 0;
             overflow: hidden;
         }
@@ -66,7 +62,7 @@
         }
 
         .sidebar-logo .logo-text {
-            color: #ffffff;
+            color: #fff;
             font-weight: 700;
             font-size: 1.05rem;
             margin-left: 14px;
@@ -74,18 +70,14 @@
             opacity: 0;
         }
 
-        .sidebar-nav {
-            flex: 1;
-            padding: 10px 0;
-            overflow: hidden;
-        }
+        .sidebar-nav { flex: 1; padding: 10px 0; overflow: hidden; }
 
         .nav-link-item {
             display: flex;
             align-items: center;
             padding: 0 18px;
             height: 48px;
-            color: rgba(255, 255, 255, 0.55);
+            color: rgba(255,255,255,0.55);
             text-decoration: none;
             cursor: pointer;
             transition: background 0.15s, color 0.15s;
@@ -93,30 +85,17 @@
             white-space: nowrap;
         }
 
-        .nav-link-item:hover {
-            background: var(--sidebar-item-hover);
-            color: rgba(255, 255, 255, 0.9);
-        }
+        .nav-link-item:hover { background: var(--sidebar-item-hover); color: rgba(255,255,255,0.9); }
 
         .nav-link-item.active {
             background: var(--sidebar-item-hover);
-            color: #ffffff;
+            color: #fff;
             border-left: 3px solid var(--accent);
             padding-left: 15px;
         }
 
-        .nav-link-item .nav-icon {
-            font-size: 1.15rem;
-            min-width: 34px;
-            flex-shrink: 0;
-        }
-
-        .nav-link-item .nav-label {
-            font-size: 0.875rem;
-            font-weight: 500;
-            opacity: 0;
-            margin-left: 2px;
-        }
+        .nav-link-item .nav-icon { font-size: 1.15rem; min-width: 34px; flex-shrink: 0; }
+        .nav-link-item .nav-label { font-size: 0.875rem; font-weight: 500; opacity: 0; margin-left: 2px; }
 
         .nav-link-item.soon {
             opacity: 0.38;
@@ -137,12 +116,9 @@
             flex-shrink: 0;
         }
 
-        .sidebar-footer {
-            border-top: 1px solid rgba(255, 255, 255, 0.07);
-            flex-shrink: 0;
-        }
+        .sidebar-footer { border-top: 1px solid rgba(255,255,255,0.07); flex-shrink: 0; }
 
-        /* ── Main content ── */
+        /* ── Main ── */
         .main-content {
             margin-left: var(--sidebar-collapsed);
             flex: 1;
@@ -151,12 +127,7 @@
         }
 
         /* ── Alerts ── */
-        .alert {
-            border-radius: 10px;
-            border: none;
-            font-size: 0.9rem;
-            margin-bottom: 20px;
-        }
+        .alert { border-radius: 10px; border: none; font-size: 0.9rem; margin-bottom: 20px; }
 
         /* ── Page header ── */
         .page-header {
@@ -166,47 +137,25 @@
             margin-bottom: 28px;
         }
 
-        .page-title {
-            font-size: 1.6rem;
-            font-weight: 700;
-            color: var(--text-primary);
-            margin: 0;
-        }
+        .page-title { font-size: 1.6rem; font-weight: 700; color: var(--text-primary); margin: 0; }
+        .page-subtitle { font-size: 0.875rem; color: var(--text-muted); margin: 2px 0 0; }
 
-        .page-subtitle {
-            font-size: 0.875rem;
-            color: var(--text-muted);
-            margin: 2px 0 0;
-        }
-
-        /* ── Create form card ── */
-        #formCrearUsuario {
-            display: none;
-        }
+        /* ── Form card ── */
+        #formCrearAutor { display: none; }
 
         .form-card {
             background: var(--surface);
             border-radius: 14px;
-            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08), 0 4px 16px rgba(0, 0, 0, 0.04);
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.04);
             padding: 28px 32px;
             margin-bottom: 24px;
         }
 
-        .form-card-title {
-            font-size: 1rem;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin: 0;
-        }
+        .form-card-title { font-size: 1rem; font-weight: 600; color: var(--text-primary); margin: 0; }
 
-        .form-label {
-            font-size: 0.85rem;
-            font-weight: 500;
-            color: #374151;
-            margin-bottom: 5px;
-        }
+        .form-label { font-size: 0.85rem; font-weight: 500; color: #374151; margin-bottom: 5px; }
 
-        .form-control {
+        .form-control, .form-select {
             border: 1px solid var(--border);
             border-radius: 8px;
             font-size: 0.9rem;
@@ -214,16 +163,61 @@
             transition: border-color 0.15s, box-shadow 0.15s;
         }
 
-        .form-control:focus {
+        .form-control:focus, .form-select:focus {
             border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+            box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
+        }
+
+        /* ── Libros toggle pills ── */
+        .libros-toggle {
+            display: inline-flex;
+            background: #f1f5f9;
+            border-radius: 10px;
+            padding: 4px;
+            gap: 2px;
+            margin-bottom: 20px;
+        }
+
+        .toggle-pill {
+            padding: 7px 18px;
+            border: none;
+            border-radius: 7px;
+            font-size: 0.82rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            background: transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .toggle-pill.active {
+            background: var(--surface);
+            color: var(--accent);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+        }
+
+        /* ── Libro row ── */
+        .libro-row {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px 14px;
+            margin-bottom: 10px;
+        }
+
+        .libro-row-counter {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 8px;
         }
 
         /* ── Table card ── */
         .table-card {
             background: var(--surface);
             border-radius: 14px;
-            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08), 0 4px 16px rgba(0, 0, 0, 0.04);
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.04);
             overflow: hidden;
         }
 
@@ -243,7 +237,7 @@
             color: var(--text-muted);
         }
 
-        .table-card-header .count-badge {
+        .count-badge {
             background: #ede9fe;
             color: #7c3aed;
             font-size: 0.78rem;
@@ -252,9 +246,21 @@
             border-radius: 999px;
         }
 
-        .table {
-            margin: 0;
+        .books-badge {
+            background: #f0fdf4;
+            color: #166534;
+            font-size: 0.78rem;
+            font-weight: 600;
+            padding: 3px 9px;
+            border-radius: 6px;
         }
+
+        .books-badge.zero {
+            background: #f8fafc;
+            color: #94a3b8;
+        }
+
+        .table { margin: 0; }
 
         .table thead th {
             background: #f8fafc;
@@ -275,17 +281,9 @@
             border-bottom: 1px solid #f1f5f9;
         }
 
-        .table tbody tr:last-child td {
-            border-bottom: none;
-        }
-
-        .table tbody tr {
-            transition: background 0.1s;
-        }
-
-        .table tbody tr:hover td {
-            background: #fafbff;
-        }
+        .table tbody tr:last-child td { border-bottom: none; }
+        .table tbody tr { transition: background 0.1s; }
+        .table tbody tr:hover td { background: #fafbff; }
 
         .id-badge {
             display: inline-flex;
@@ -301,14 +299,24 @@
             border-radius: 999px;
         }
 
-        .email-link {
-            color: var(--text-muted);
-            text-decoration: none;
-            font-size: 0.875rem;
+        .autor-cell {
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .email-link:hover {
-            color: var(--accent);
+        .autor-avatar {
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, var(--accent), #818cf8);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 0.7rem;
+            font-weight: 700;
+            flex-shrink: 0;
         }
 
         /* ── Empty state ── */
@@ -325,10 +333,7 @@
             color: #cbd5e1;
         }
 
-        .empty-state p {
-            margin: 0;
-            font-size: 0.95rem;
-        }
+        .empty-state p { margin: 0; font-size: 0.95rem; }
 
         /* ── Pagination ── */
         .pagination-wrapper {
@@ -339,15 +344,8 @@
             align-items: center;
         }
 
-        .pagination-info {
-            font-size: 0.83rem;
-            color: var(--text-muted);
-        }
-
-        .pagination {
-            margin: 0;
-            gap: 4px;
-        }
+        .pagination-info { font-size: 0.83rem; color: var(--text-muted); }
+        .pagination { margin: 0; gap: 4px; }
 
         .page-link {
             border: 1px solid var(--border) !important;
@@ -355,26 +353,12 @@
             color: #475569;
             font-size: 0.85rem;
             padding: 5px 11px;
-            line-height: 1.5;
             transition: all 0.15s;
         }
 
-        .page-link:hover {
-            background: #f1f5f9;
-            color: var(--accent);
-            border-color: var(--accent) !important;
-        }
-
-        .page-item.active .page-link {
-            background: var(--accent) !important;
-            border-color: var(--accent) !important;
-            color: #fff;
-        }
-
-        .page-item.disabled .page-link {
-            opacity: 0.4;
-            pointer-events: none;
-        }
+        .page-link:hover { background: #f1f5f9; color: var(--accent); border-color: var(--accent) !important; }
+        .page-item.active .page-link { background: var(--accent) !important; border-color: var(--accent) !important; color: #fff; }
+        .page-item.disabled .page-link { opacity: 0.4; pointer-events: none; }
 
         /* ── Buttons ── */
         .btn-accent {
@@ -388,15 +372,8 @@
             transition: background 0.15s, transform 0.1s;
         }
 
-        .btn-accent:hover {
-            background: var(--accent-dark);
-            color: #fff;
-            transform: translateY(-1px);
-        }
-
-        .btn-accent:active {
-            transform: translateY(0);
-        }
+        .btn-accent:hover { background: var(--accent-dark); color: #fff; transform: translateY(-1px); }
+        .btn-accent:active { transform: translateY(0); }
 
         .btn-ghost {
             background: transparent;
@@ -409,10 +386,7 @@
             transition: all 0.15s;
         }
 
-        .btn-ghost:hover {
-            background: #f1f5f9;
-            color: var(--text-primary);
-        }
+        .btn-ghost:hover { background: #f1f5f9; color: var(--text-primary); }
 
         .btn-icon {
             background: transparent;
@@ -425,9 +399,41 @@
             transition: all 0.15s;
         }
 
-        .btn-icon:hover {
-            background: #f1f5f9;
-            color: var(--text-primary);
+        .btn-icon:hover { background: #fee2e2; color: #dc2626; border-color: #fca5a5; }
+
+        .btn-add-libro {
+            background: transparent;
+            border: 1px dashed var(--accent);
+            color: var(--accent);
+            border-radius: 9px;
+            padding: 8px 18px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.15s;
+            width: 100%;
+            margin-top: 4px;
+        }
+
+        .btn-add-libro:hover { background: rgba(99,102,241,0.06); }
+
+        /* ── Divider ── */
+        .section-divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 20px 0 16px;
+            color: var(--text-muted);
+            font-size: 0.78rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .section-divider::before, .section-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
         }
     </style>
 </head>
@@ -444,7 +450,7 @@
         </div>
 
         <div class="sidebar-nav">
-            <a href="/" class="nav-link-item active">
+            <a href="/" class="nav-link-item">
                 <i class="bi bi-people nav-icon"></i>
                 <span class="nav-label">Usuarios</span>
             </a>
@@ -457,7 +463,7 @@
                 <span class="nav-label">Préstamos</span>
                 <span class="soon-badge">Pronto</span>
             </a>
-            <a href="/autores" class="nav-link-item">
+            <a href="/autores" class="nav-link-item active">
                 <i class="bi bi-person-lines-fill nav-icon"></i>
                 <span class="nav-label">Autores</span>
             </a>
@@ -497,63 +503,73 @@
         <!-- Page Header -->
         <div class="page-header">
             <div>
-                <h1 class="page-title">Usuarios</h1>
-                <p class="page-subtitle">Gestiona los usuarios del sistema de biblioteca</p>
+                <h1 class="page-title">Autores</h1>
+                <p class="page-subtitle">Gestiona los autores del catálogo de la biblioteca</p>
             </div>
             <button class="btn-accent" id="btnToggleForm">
-                <i class="bi bi-plus-lg me-1"></i> Nuevo usuario
+                <i class="bi bi-plus-lg me-1"></i> Nuevo autor
             </button>
         </div>
 
-        <!-- ── Create User Form (hidden by default) ── -->
-        <div id="formCrearUsuario">
+        <!-- ── Create Autor Form (hidden by default) ── -->
+        <div id="formCrearAutor">
             <div class="form-card">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h5 class="form-card-title">
                         <i class="bi bi-person-plus me-2 text-muted" style="font-size: 1rem;"></i>
-                        Crear nuevo usuario
+                        Crear nuevo autor
                     </h5>
                     <button type="button" class="btn-icon" id="btnCerrarForm">
                         <i class="bi bi-x-lg"></i>
                     </button>
                 </div>
 
-                <form th:action="@{/}" th:object="${createUsuarioDTO}" method="post">
-                    <div class="row g-3">
-                        <div class="col-md-4">
-                            <label class="form-label">
-                                Nombre <span class="text-danger">*</span>
-                            </label>
+                <form th:action="@{/autores}" th:object="${createAutorConLibroDTO}" method="post">
+
+                    <!-- Nombre + Apellido -->
+                    <div class="row g-3 mb-2">
+                        <div class="col-md-6">
+                            <label class="form-label">Nombre <span class="text-danger">*</span></label>
                             <input type="text"
                                    class="form-control"
                                    th:field="*{nombre}"
-                                   placeholder="Ej: Juan"
+                                   placeholder="Ej: Gabriel"
                                    required>
                         </div>
-                        <div class="col-md-4">
-                            <label class="form-label">
-                                Apellido <span class="text-danger">*</span>
-                            </label>
+                        <div class="col-md-6">
+                            <label class="form-label">Apellido <span class="text-danger">*</span></label>
                             <input type="text"
                                    class="form-control"
                                    th:field="*{apellido}"
-                                   placeholder="Ej: Pérez"
-                                   required>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">
-                                Correo electrónico <span class="text-danger">*</span>
-                            </label>
-                            <input type="email"
-                                   class="form-control"
-                                   th:field="*{correo}"
-                                   placeholder="Ej: juan@correo.com"
+                                   placeholder="Ej: Garcia Marquez"
                                    required>
                         </div>
                     </div>
+
+                    <!-- Libros section -->
+                    <div class="section-divider">Libros</div>
+
+                    <!-- Toggle pills -->
+                    <div class="libros-toggle">
+                        <button type="button" class="toggle-pill active" id="pillSinLibros">
+                            <i class="bi bi-person me-1"></i> Sin libros
+                        </button>
+                        <button type="button" class="toggle-pill" id="pillConLibros">
+                            <i class="bi bi-journal-plus me-1"></i> Con libros
+                        </button>
+                    </div>
+
+                    <!-- Panel: con libros -->
+                    <div id="panelLibros" style="display:none;">
+                        <div id="librosContainer"></div>
+                        <button type="button" class="btn-add-libro" id="btnAgregarLibro">
+                            <i class="bi bi-plus-lg me-1"></i> Agregar libro
+                        </button>
+                    </div>
+
                     <div class="mt-4 d-flex gap-2">
                         <button type="submit" class="btn-accent">
-                            <i class="bi bi-check-lg me-1"></i> Guardar
+                            <i class="bi bi-check-lg me-1"></i> Guardar autor
                         </button>
                         <button type="button" class="btn-ghost" id="btnCancelar">
                             Cancelar
@@ -563,45 +579,45 @@
             </div>
         </div>
 
-        <!-- ── Users Table ── -->
+        <!-- ── Autores Table ── -->
         <div class="table-card">
 
             <div class="table-card-header">
-                <span class="label">Listado de usuarios</span>
-                <span class="count-badge" th:text="${usuarios.totalElements} + ' registros'">0 registros</span>
+                <span class="label">Listado de autores</span>
+                <span class="count-badge" th:text="${autores.totalElements} + ' registros'">0 registros</span>
             </div>
 
             <!-- Empty state -->
-            <div th:if="${usuarios.content.isEmpty()}" class="empty-state">
-                <i class="bi bi-people empty-icon"></i>
-                <p>No hay usuarios registrados aún.<br>
-                    <span style="font-size:0.85rem;">Presiona <strong>Nuevo usuario</strong> para agregar el primero.</span>
+            <div th:if="${autores.content.isEmpty()}" class="empty-state">
+                <i class="bi bi-person-x empty-icon"></i>
+                <p>No hay autores registrados aún.<br>
+                    <span style="font-size:0.85rem;">Presiona <strong>Nuevo autor</strong> para agregar el primero.</span>
                 </p>
             </div>
 
             <!-- Table -->
-            <div th:if="${!usuarios.content.isEmpty()}" class="table-responsive">
+            <div th:if="${!autores.content.isEmpty()}" class="table-responsive">
                 <table class="table">
                     <thead>
                     <tr>
                         <th style="width: 72px;">ID</th>
                         <th>Nombre</th>
                         <th>Apellido</th>
-                        <th>Correo electrónico</th>
                     </tr>
                     </thead>
                     <tbody>
-                    <tr th:each="usuario : ${usuarios.content}">
+                    <tr th:each="autor : ${autores.content}">
                         <td>
-                            <span class="id-badge" th:text="${usuario.idUsuario}">1</span>
+                            <span class="id-badge" th:text="${autor.idAutor}">1</span>
                         </td>
-                        <td th:text="${usuario.nombre}">Nombre</td>
-                        <td th:text="${usuario.apellido}">Apellido</td>
                         <td>
-                            <a class="email-link"
-                               th:href="'mailto:' + ${usuario.correo}"
-                               th:text="${usuario.correo}">correo@mail.com</a>
+                            <div class="autor-cell">
+                                <div class="autor-avatar"
+                                     th:text="${#strings.substring(autor.nombre, 0, 1)}">G</div>
+                                <span th:text="${autor.nombre}">Nombre</span>
+                            </div>
                         </td>
+                        <td th:text="${autor.apellido}">Apellido</td>
                     </tr>
                     </tbody>
                 </table>
@@ -613,12 +629,11 @@
                     Página <strong th:text="${currentPage + 1}">1</strong>
                     de <strong th:text="${totalPages}">1</strong>
                 </span>
-                <nav aria-label="Paginación de usuarios">
+                <nav aria-label="Paginación de autores">
                     <ul class="pagination pagination-sm d-flex">
                         <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
                             <a class="page-link"
-                               th:href="@{/(page=${currentPage - 1}, size=10)}"
-                               aria-label="Anterior">
+                               th:href="@{/autores(page=${currentPage - 1}, size=10)}">
                                 <i class="bi bi-chevron-left"></i>
                             </a>
                         </li>
@@ -626,13 +641,12 @@
                             th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
                             th:classappend="${i == currentPage} ? 'active'">
                             <a class="page-link"
-                               th:href="@{/(page=${i}, size=10)}"
+                               th:href="@{/autores(page=${i}, size=10)}"
                                th:text="${i + 1}">1</a>
                         </li>
                         <li class="page-item" th:classappend="${currentPage + 1 >= totalPages} ? 'disabled'">
                             <a class="page-link"
-                               th:href="@{/(page=${currentPage + 1}, size=10)}"
-                               aria-label="Siguiente">
+                               th:href="@{/autores(page=${currentPage + 1}, size=10)}">
                                 <i class="bi bi-chevron-right"></i>
                             </a>
                         </li>
@@ -653,7 +667,7 @@
     /* ══════════════════════════════════
        SIDEBAR — hover expand / collapse
     ══════════════════════════════════ */
-    const sidebar  = document.getElementById('sidebar');
+    const sidebar   = document.getElementById('sidebar');
     const COLLAPSED = 70;
     const EXPANDED  = 240;
     let sidebarOpen = false;
@@ -661,7 +675,6 @@
     sidebar.addEventListener('mouseenter', () => {
         if (sidebarOpen) return;
         sidebarOpen = true;
-
         anime({
             targets: sidebar,
             width: EXPANDED,
@@ -677,7 +690,6 @@
     sidebar.addEventListener('mouseleave', () => {
         if (!sidebarOpen) return;
         sidebarOpen = false;
-
         anime({
             targets: '.logo-text, .nav-label, .soon-badge',
             opacity: 0,
@@ -693,29 +705,21 @@
     /* ══════════════════════════════════
        FORM — toggle show / hide
     ══════════════════════════════════ */
-    const formEl     = document.getElementById('formCrearUsuario');
-    const btnToggle  = document.getElementById('btnToggleForm');
-    const btnCerrar  = document.getElementById('btnCerrarForm');
+    const formEl      = document.getElementById('formCrearAutor');
+    const btnToggle   = document.getElementById('btnToggleForm');
+    const btnCerrar   = document.getElementById('btnCerrarForm');
     const btnCancelar = document.getElementById('btnCancelar');
-    let formVisible  = false;
+    let formVisible   = false;
 
     function showForm() {
         formVisible = true;
         formEl.style.display = 'block';
         btnToggle.innerHTML  = '<i class="bi bi-x-lg me-1"></i> Cerrar';
-
-        anime({
-            targets: formEl,
-            opacity: [0, 1],
-            translateY: [-18, 0],
-            duration: 380,
-            easing: 'easeOutBack'
-        });
+        anime({ targets: formEl, opacity: [0, 1], translateY: [-18, 0], duration: 380, easing: 'easeOutBack' });
     }
 
     function hideForm() {
         formVisible = false;
-
         anime({
             targets: formEl,
             opacity: [1, 0],
@@ -724,7 +728,7 @@
             easing: 'easeInQuart',
             complete() {
                 formEl.style.display = 'none';
-                btnToggle.innerHTML  = '<i class="bi bi-plus-lg me-1"></i> Nuevo usuario';
+                btnToggle.innerHTML  = '<i class="bi bi-plus-lg me-1"></i> Nuevo autor';
             }
         });
     }
@@ -733,9 +737,109 @@
     btnCerrar.addEventListener('click',   hideForm);
     btnCancelar.addEventListener('click', hideForm);
 
-    /* Si hubo error en el submit, re-abre el formulario automáticamente */
     const hasError = document.querySelector('.alert-danger');
     if (hasError) showForm();
+
+
+    /* ══════════════════════════════════
+       LIBROS TOGGLE — sin / con libros
+    ══════════════════════════════════ */
+    const pillSin    = document.getElementById('pillSinLibros');
+    const pillCon    = document.getElementById('pillConLibros');
+    const panelLibros = document.getElementById('panelLibros');
+    const container  = document.getElementById('librosContainer');
+    let libroIndex   = 0;
+
+    pillSin.addEventListener('click', () => {
+        pillSin.classList.add('active');
+        pillCon.classList.remove('active');
+        anime({
+            targets: panelLibros,
+            opacity: 0,
+            height: 0,
+            duration: 200,
+            easing: 'easeInQuart',
+            complete() {
+                panelLibros.style.display = 'none';
+                container.innerHTML = '';
+                libroIndex = 0;
+            }
+        });
+    });
+
+    pillCon.addEventListener('click', () => {
+        pillCon.classList.add('active');
+        pillSin.classList.remove('active');
+        panelLibros.style.display = 'block';
+        anime({ targets: panelLibros, opacity: [0, 1], duration: 280, easing: 'easeOutQuart' });
+        if (libroIndex === 0) agregarLibro();
+    });
+
+    document.getElementById('btnAgregarLibro').addEventListener('click', agregarLibro);
+
+    function agregarLibro() {
+        const idx = libroIndex++;
+        const row = document.createElement('div');
+        row.className = 'libro-row';
+        row.dataset.idx = idx;
+        row.innerHTML = `
+            <div class="libro-row-counter">Libro ${idx + 1}</div>
+            <div class="row g-2 align-items-end">
+                <div class="col-md-7">
+                    <label class="form-label">Título <span class="text-danger">*</span></label>
+                    <input type="text"
+                           class="form-control"
+                           name="libros[${idx}].titulo"
+                           placeholder="Ej: Cien años de soledad"
+                           required>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Año <span class="text-danger">*</span></label>
+                    <input type="number"
+                           class="form-control"
+                           name="libros[${idx}].anioPublicacion"
+                           placeholder="Ej: 1967"
+                           min="1000" max="2100"
+                           required>
+                </div>
+                <div class="col-md-2 d-flex justify-content-end">
+                    <button type="button" class="btn-icon" onclick="eliminarLibro(this)">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+        container.appendChild(row);
+        anime({ targets: row, opacity: [0, 1], translateY: [-10, 0], duration: 280, easing: 'easeOutQuart' });
+    }
+
+    function eliminarLibro(btn) {
+        const row = btn.closest('.libro-row');
+        anime({
+            targets: row,
+            opacity: 0,
+            height: 0,
+            marginBottom: 0,
+            paddingTop: 0,
+            paddingBottom: 0,
+            duration: 220,
+            easing: 'easeInQuart',
+            complete() {
+                row.remove();
+                reindexarLibros();
+            }
+        });
+    }
+
+    function reindexarLibros() {
+        const rows = container.querySelectorAll('.libro-row');
+        rows.forEach((row, i) => {
+            row.querySelector('.libro-row-counter').textContent = `Libro ${i + 1}`;
+            row.querySelector('input[type="text"]').name   = `libros[${i}].titulo`;
+            row.querySelector('input[type="number"]').name = `libros[${i}].anioPublicacion`;
+        });
+        libroIndex = rows.length;
+    }
 
 
     /* ══════════════════════════════════

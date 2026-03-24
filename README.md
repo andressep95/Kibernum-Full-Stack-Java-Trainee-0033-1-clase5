@@ -98,9 +98,13 @@ Se introdujo el patrón **DTO** para desacoplar las entidades JPA de la capa de 
 | `CreateLibroDTO` | Formulario → Servicio | Recibe título, año y un `CreateAutorDTO` anidado |
 | `ListLibroDTO` | Servicio → Vista | Expone id, título, año y el nombre completo del autor como `String` |
 | `CreateAutorDTO` | Anidado en `CreateLibroDTO` | Transporta nombre y apellido del autor al crear un libro |
-| `ListAutorDTO` | Servicio → Vista | Expone id, nombre y apellido para el desplegable de autores |
+| `ListAutorDTO` | Servicio → Vista | Expone id, nombre y apellido para el listado de autores |
+| `CreateAutorConLibroDTO` | Formulario → Servicio | Recibe nombre, apellido y una lista opcional de `CreateLibroSinAutorDTO` |
+| `CreateLibroSinAutorDTO` | Anidado en `CreateAutorConLibroDTO` | Transporta título y año de publicación de un libro al crear un autor |
 
 > **Nota sobre anidamiento:** `CreateLibroDTO` contiene un `CreateAutorDTO` como campo. Esto modela la relación del formulario: al crear un libro siempre se especifica un autor, ya sea existente o nuevo. Spring MVC enlaza los campos anidados usando notación de punto (`autor.nombre`, `autor.apellido`).
+
+> **Nota sobre colecciones en DTOs:** `CreateAutorConLibroDTO` usa `List<CreateLibroSinAutorDTO>` (no `Set`) porque Spring MVC requiere una colección indexable para hacer binding desde inputs HTML con notación `libros[0].titulo`, `libros[1].titulo`, etc. Un `Set` no tiene índice definido y no puede recibir este tipo de binding.
 
 ### 8. Capa de servicios
 
@@ -134,6 +138,30 @@ if (autorRepository.existsByNombreAndApellido(nombre, apellido)) {
 
 El controlador no sabe si el autor era nuevo o existente — esa decisión pertenece al servicio.
 
+#### Lógica de negocio destacada en `AutorServiceImpl`
+
+Al crear un autor, los libros son opcionales. El servicio guarda primero el autor para obtener su ID generado y luego lo asocia a cada libro:
+
+```java
+Autor autorGuardado = AutorRepository.save(autor); // obtiene el ID generado
+
+if (createAutorConLibroDTO.getLibros() != null && !createAutorConLibroDTO.getLibros().isEmpty()) {
+    for (CreateLibroSinAutorDTO libro : createAutorConLibroDTO.getLibros()) {
+        Libro nuevoLibro = new Libro();
+        nuevoLibro.setTitulo(libro.getTitulo());
+        nuevoLibro.setAnioPublicacion(libro.getAnioPublicacion());
+        nuevoLibro.setIdAutor(autorGuardado); // FK al autor recién persistido
+        libroRepository.save(nuevoLibro);
+    }
+}
+```
+
+El autor se persiste en un paso separado antes de los libros porque necesita tener un ID asignado para actuar como clave foránea.
+
+El servicio también expone dos variantes de listado:
+- `obtenerAutores()` — retorna `List<ListAutorDTO>`, usada por el desplegable de `LibroController`.
+- `obtenerAutoresPaginado(page, size)` — retorna `Page<ListAutorDTO>`, usada por la vista de autores.
+
 #### Validaciones en el servicio
 
 Las validaciones de negocio (campos obligatorios, correo duplicado) se lanzaron como `IllegalArgumentException` dentro del servicio. El controlador las captura y las redirige a la vista como mensajes de error:
@@ -154,7 +182,7 @@ try {
 
 ### 9. Capa de controladores (Spring MVC)
 
-Se implementaron dos controladores siguiendo el patrón **MVC** de Spring:
+Se implementaron tres controladores siguiendo el patrón **MVC** de Spring:
 
 #### `UsuarioController` — mapeado en `"/"`
 
@@ -169,6 +197,13 @@ Se implementaron dos controladores siguiendo el patrón **MVC** de Spring:
 |---|---|---|
 | `@GetMapping` | `/libros` | Carga libros paginados + lista de autores, retorna vista `libros` |
 | `@PostMapping` | `/libros` | Recibe el formulario de libro, crea y redirige |
+
+#### `AutorController` — mapeado en `"/autores"`
+
+| Método | Ruta | Acción |
+|---|---|---|
+| `@GetMapping` | `/autores` | Carga autores paginados y retorna la vista `autores` |
+| `@PostMapping` | `/autores` | Recibe el formulario de autor (con o sin libros), crea y redirige |
 
 #### Conceptos clave aplicados
 
@@ -206,12 +241,13 @@ return "redirect:/";
 
 ### 10. Capa de vistas (Thymeleaf + Bootstrap + Anime.js)
 
-Se implementaron dos vistas HTML bajo `src/main/resources/templates/`:
+Se implementaron tres vistas HTML bajo `src/main/resources/templates/`:
 
 | Archivo | Ruta | Descripción |
 |---|---|---|
 | `index.html` | `/` | Listado de usuarios con formulario de creación |
 | `libros.html` | `/libros` | Listado de libros con formulario de creación |
+| `autores.html` | `/autores` | Listado de autores con formulario de creación (con o sin libros) |
 
 #### Enlace formulario ↔ controlador en Thymeleaf
 
@@ -301,19 +337,46 @@ El formulario de libros ofrece dos modos para especificar el autor:
 
 En ambos casos el servidor recibe `autor.nombre` y `autor.apellido`. La lógica de si es autor nuevo o existente reside enteramente en `LibroServiceImpl`.
 
+#### Binding dinámico de colecciones indexadas (vista de autores)
+
+El formulario de autores permite agregar cero o más libros de forma dinámica. Cada libro es una fila generada por JavaScript con inputs nombrados con índice explícito:
+
+```javascript
+function agregarLibro() {
+    const idx = libroIndex++;
+    row.innerHTML = `
+        <input type="text"   name="libros[${idx}].titulo">
+        <input type="number" name="libros[${idx}].anioPublicacion">
+    `;
+}
+```
+
+Spring MVC recibe los parámetros `libros[0].titulo`, `libros[1].titulo`, etc. y los deserializa automáticamente en `List<CreateLibroSinAutorDTO>` del DTO. Esto requiere que la colección en el DTO sea un `List` (indexable), no un `Set`.
+
+Al eliminar una fila, la función `reindexarLibros()` recorre el DOM y reasigna los atributos `name` correlativamente, garantizando que los índices no queden con huecos (lo que impediría el binding):
+
+```javascript
+function reindexarLibros() {
+    container.querySelectorAll('.libro-row').forEach((row, i) => {
+        row.querySelector('input[type="text"]').name   = `libros[${i}].titulo`;
+        row.querySelector('input[type="number"]').name = `libros[${i}].anioPublicacion`;
+    });
+}
+```
+
 ---
 
 ## Tareas planificadas
 
 El archivo `Tasks.md` define los escenarios de uso que guían el desarrollo futuro:
 
-- Registro de libros (con autores nuevos, existentes, múltiples o desconocidos)
-- Registro de autores
-- Registro de usuarios
-- Registro de préstamos
-- Consultas de libros por autor, año, título, disponibilidad
-- Consultas de autores por nombre, libro o ranking de préstamos
-- Consultas de usuarios y préstamos
+- ✅ Registro de usuarios
+- ✅ Registro de libros (con autor nuevo o existente)
+- ✅ Registro de autores (con o sin libros asociados)
+- ⬜ Registro de préstamos
+- ⬜ Consultas de libros por autor, año, título, disponibilidad
+- ⬜ Consultas de autores por nombre, libro o ranking de préstamos
+- ⬜ Consultas de usuarios y préstamos
 
 ---
 
@@ -345,14 +408,17 @@ biblioteca/
 │       │   ├── BibliotecaApplication.java
 │       │   ├── controller/
 │       │   │   ├── UsuarioController.java      ← GET / y POST /
-│       │   │   └── LibroController.java        ← GET /libros y POST /libros
+│       │   │   ├── LibroController.java        ← GET /libros y POST /libros
+│       │   │   └── AutorController.java        ← GET /autores y POST /autores
 │       │   ├── dto/
 │       │   │   ├── CreateUsuarioDTO.java
 │       │   │   ├── ListUsuarioDTO.java
 │       │   │   ├── CreateLibroDTO.java
 │       │   │   ├── ListLibroDTO.java
 │       │   │   ├── CreateAutorDTO.java
-│       │   │   └── ListAutorDTO.java
+│       │   │   ├── ListAutorDTO.java
+│       │   │   ├── CreateAutorConLibroDTO.java
+│       │   │   └── CreateLibroSinAutorDTO.java
 │       │   ├── model/
 │       │   │   ├── Autor.java
 │       │   │   ├── Libro.java
@@ -375,7 +441,8 @@ biblioteca/
 │           ├── application.properties
 │           └── templates/
 │               ├── index.html                  ← Vista de usuarios (/)
-│               └── libros.html                 ← Vista de libros (/libros)
+│               ├── libros.html                 ← Vista de libros (/libros)
+│               └── autores.html                ← Vista de autores (/autores)
 ├── sql/
 │   ├── init.sql
 │   └── postgres.sql
@@ -414,3 +481,4 @@ Este proyecto es una actividad de aprendizaje orientada a practicar:
 - Layouts responsivos con Bootstrap 5.
 - Animaciones declarativas con Anime.js (sidebar, formularios, alertas).
 - Sincronización de campos de formulario mediante JavaScript vanilla.
+- Binding dinámico de colecciones con inputs indexados (`name="libros[i].campo"`) y re-indexado del DOM al eliminar filas.

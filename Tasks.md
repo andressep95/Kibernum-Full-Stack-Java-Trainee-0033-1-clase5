@@ -12,7 +12,7 @@
 ### Registrar Autores
 
 - Escenario 1: Autor simple (nombre, apellido) o parcial.
-- Escenario 2: Autor con libros registrados anteriormente.
+- Escenario 2: Autor con libros registrados anteriormente. [x]
 - Escenario 3: Autor con libros nuevos para registrar.
 - Escenario 4: Autor con libros sin libros conocidos.
 
