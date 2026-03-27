@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Biblioteca - Libros</title>
+    <title>Biblioteca - Préstamos</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
     <style>
@@ -141,7 +141,7 @@
         .page-subtitle { font-size: 0.875rem; color: var(--text-muted); margin: 2px 0 0; }
 
         /* ── Form card ── */
-        #formCrearLibro { display: none; }
+        #formCrearPrestamo { display: none; }
 
         .form-card {
             background: var(--surface);
@@ -174,8 +174,8 @@
             cursor: default;
         }
 
-        /* ── Autor toggle pills ── */
-        .autor-toggle {
+        /* ── Toggle pills ── */
+        .usuario-toggle {
             display: inline-flex;
             background: #f1f5f9;
             border-radius: 10px;
@@ -203,7 +203,27 @@
             box-shadow: 0 1px 3px rgba(0,0,0,0.12);
         }
 
-        .autor-panel { overflow: hidden; }
+        .usuario-panel { overflow: hidden; }
+
+        /* ── Section divider ── */
+        .section-divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 20px 0 16px;
+            color: var(--text-muted);
+            font-size: 0.78rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .section-divider::before, .section-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
 
         /* ── Table card ── */
         .table-card {
@@ -277,25 +297,25 @@
             border-radius: 999px;
         }
 
-        .year-badge {
-            background: #f0fdf4;
-            color: #166534;
+        .date-badge {
+            background: #eff6ff;
+            color: #1d4ed8;
             font-size: 0.78rem;
             font-weight: 600;
             padding: 3px 9px;
             border-radius: 6px;
         }
 
-        .autor-cell {
+        .usuario-cell {
             display: flex;
             align-items: center;
             gap: 8px;
         }
 
-        .autor-avatar {
+        .usuario-avatar {
             width: 28px;
             height: 28px;
-            background: linear-gradient(135deg, var(--accent), #818cf8);
+            background: linear-gradient(135deg, #10b981, #34d399);
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -303,6 +323,25 @@
             color: #fff;
             font-size: 0.7rem;
             font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .libro-cell {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .libro-icon {
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, var(--accent), #818cf8);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 0.75rem;
             flex-shrink: 0;
         }
 
@@ -387,26 +426,6 @@
         }
 
         .btn-icon:hover { background: #f1f5f9; color: var(--text-primary); }
-
-        /* ── Divider ── */
-        .section-divider {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin: 20px 0 16px;
-            color: var(--text-muted);
-            font-size: 0.78rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .section-divider::before, .section-divider::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: var(--border);
-        }
     </style>
 </head>
 <body>
@@ -426,11 +445,11 @@
                 <i class="bi bi-people nav-icon"></i>
                 <span class="nav-label">Usuarios</span>
             </a>
-            <a href="/libros" class="nav-link-item active">
+            <a href="/libros" class="nav-link-item">
                 <i class="bi bi-journal-bookmark nav-icon"></i>
                 <span class="nav-label">Libros</span>
             </a>
-            <a href="/prestamos" class="nav-link-item">
+            <a href="/prestamos" class="nav-link-item active">
                 <i class="bi bi-bookmark-check nav-icon"></i>
                 <span class="nav-label">Préstamos</span>
             </a>
@@ -474,116 +493,114 @@
         <!-- Page Header -->
         <div class="page-header">
             <div>
-                <h1 class="page-title">Libros</h1>
-                <p class="page-subtitle">Gestiona el catálogo de libros de la biblioteca</p>
+                <h1 class="page-title">Préstamos</h1>
+                <p class="page-subtitle">Registra y gestiona los préstamos de libros de la biblioteca</p>
             </div>
             <button class="btn-accent" id="btnToggleForm">
-                <i class="bi bi-plus-lg me-1"></i> Nuevo libro
+                <i class="bi bi-plus-lg me-1"></i> Nuevo préstamo
             </button>
         </div>
 
-        <!-- ── Create Book Form (hidden by default) ── -->
-        <div id="formCrearLibro">
+        <!-- ── Create Prestamo Form (hidden by default) ── -->
+        <div id="formCrearPrestamo">
             <div class="form-card">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h5 class="form-card-title">
-                        <i class="bi bi-journal-plus me-2 text-muted" style="font-size: 1rem;"></i>
-                        Crear nuevo libro
+                        <i class="bi bi-bookmark-plus me-2 text-muted" style="font-size: 1rem;"></i>
+                        Registrar nuevo préstamo
                     </h5>
                     <button type="button" class="btn-icon" id="btnCerrarForm">
                         <i class="bi bi-x-lg"></i>
                     </button>
                 </div>
 
-                <form th:action="@{/libros}" th:object="${createLibroDTO}" method="post">
+                <form th:action="@{/prestamos}" th:object="${createPrestamoDTO}" method="post">
 
-                    <!-- Título + Año -->
+                    <!-- Libro section -->
+                    <div class="section-divider">Libro</div>
                     <div class="row g-3 mb-2">
-                        <div class="col-md-8">
-                            <label class="form-label">Título <span class="text-danger">*</span></label>
-                            <input type="text"
-                                   class="form-control"
-                                   th:field="*{titulo}"
-                                   placeholder="Ej: Cien años de soledad"
-                                   required>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Año de publicación <span class="text-danger">*</span></label>
-                            <input type="number"
-                                   class="form-control"
-                                   th:field="*{anioPublicacion}"
-                                   placeholder="Ej: 1967"
-                                   min="1000"
-                                   max="2100"
-                                   required>
+                        <div class="col-12">
+                            <label class="form-label">Seleccionar libro <span class="text-danger">*</span></label>
+                            <select class="form-select" id="selectLibro">
+                                <option value="" disabled selected>-- Selecciona un libro --</option>
+                                <option th:each="libro : ${libros}"
+                                        th:value="${libro.idLibro}"
+                                        th:text="${libro.titulo + ' — ' + libro.autor + ' (' + libro.anioPublicacion + ')'}">
+                                </option>
+                            </select>
                         </div>
                     </div>
 
-                    <!-- Autor section -->
-                    <div class="section-divider">Autor</div>
+                    <!-- Usuario section -->
+                    <div class="section-divider">Usuario</div>
 
                     <!-- Toggle pills -->
-                    <div class="autor-toggle">
+                    <div class="usuario-toggle">
                         <button type="button" class="toggle-pill active" id="pillExistente">
-                            <i class="bi bi-person-check me-1"></i> Autor existente
+                            <i class="bi bi-person-check me-1"></i> Usuario existente
                         </button>
                         <button type="button" class="toggle-pill" id="pillNuevo">
-                            <i class="bi bi-person-plus me-1"></i> Autor nuevo
+                            <i class="bi bi-person-plus me-1"></i> Usuario nuevo
                         </button>
                     </div>
 
-                    <!-- Panel: Autor existente -->
-                    <div id="panelAutorExistente" class="autor-panel">
+                    <!-- Panel: Usuario existente -->
+                    <div id="panelUsuarioExistente" class="usuario-panel">
                         <div class="row g-3">
                             <div class="col-12">
-                                <label class="form-label">Seleccionar autor</label>
-                                <select class="form-select" id="selectAutorExistente">
-                                    <option value="" disabled selected>-- Selecciona un autor --</option>
-                                    <option th:each="autor : ${autores}"
-                                            th:value="${autor.idAutor}"
-                                            th:text="${autor.nombre + ' ' + autor.apellido}"
-                                            th:attr="data-nombre=${autor.nombre},data-apellido=${autor.apellido}">
+                                <label class="form-label">Seleccionar usuario</label>
+                                <select class="form-select" id="selectUsuarioExistente">
+                                    <option value="" disabled selected>-- Selecciona un usuario --</option>
+                                    <option th:each="usuario : ${usuarios}"
+                                            th:value="${usuario.idUsuario}"
+                                            th:text="${usuario.nombre + ' ' + usuario.apellido + ' — ' + usuario.correo}"
+                                            th:attr="data-nombre=${usuario.nombre},data-apellido=${usuario.apellido},data-correo=${usuario.correo}">
                                     </option>
                                 </select>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <label class="form-label text-muted" style="font-size:0.8rem;">Nombre (autocompletado)</label>
-                                <input type="text" class="form-control" id="displayNombre" readonly placeholder="Selecciona un autor arriba">
+                                <input type="text" class="form-control" id="displayNombre" readonly placeholder="Selecciona un usuario arriba">
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <label class="form-label text-muted" style="font-size:0.8rem;">Apellido (autocompletado)</label>
-                                <input type="text" class="form-control" id="displayApellido" readonly placeholder="Selecciona un autor arriba">
+                                <input type="text" class="form-control" id="displayApellido" readonly placeholder="Selecciona un usuario arriba">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label text-muted" style="font-size:0.8rem;">Correo (autocompletado)</label>
+                                <input type="text" class="form-control" id="displayCorreo" readonly placeholder="Selecciona un usuario arriba">
                             </div>
                         </div>
                     </div>
 
-                    <!-- Panel: Autor nuevo -->
-                    <div id="panelAutorNuevo" class="autor-panel" style="display:none;">
+                    <!-- Panel: Usuario nuevo -->
+                    <div id="panelUsuarioNuevo" class="usuario-panel" style="display:none;">
                         <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Nombre del autor <span class="text-danger">*</span></label>
-                                <input type="text"
-                                       class="form-control"
-                                       id="inputNuevoNombre"
-                                       placeholder="Ej: Gabriel">
+                            <div class="col-md-4">
+                                <label class="form-label">Nombre <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="inputNuevoNombre" placeholder="Ej: Juan">
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Apellido del autor <span class="text-danger">*</span></label>
-                                <input type="text"
-                                       class="form-control"
-                                       id="inputNuevoApellido"
-                                       placeholder="Ej: García Márquez">
+                            <div class="col-md-4">
+                                <label class="form-label">Apellido <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="inputNuevoApellido" placeholder="Ej: Pérez">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Correo electrónico <span class="text-danger">*</span></label>
+                                <input type="email" class="form-control" id="inputNuevoCorreo" placeholder="Ej: juan@correo.com">
                             </div>
                         </div>
                     </div>
 
-                    <!-- Hidden fields que siempre se envían -->
-                    <input type="hidden" th:field="*{autor.nombre}" id="hiddenNombre">
-                    <input type="hidden" th:field="*{autor.apellido}" id="hiddenApellido">
+                    <!-- Hidden fields that get submitted -->
+                    <input type="hidden" th:field="*{idLibro}"   id="hiddenIdLibro">
+                    <input type="hidden" th:field="*{idUsuario}" id="hiddenIdUsuario">
+                    <input type="hidden" th:field="*{nombre}"    id="hiddenNombre">
+                    <input type="hidden" th:field="*{apellido}"  id="hiddenApellido">
+                    <input type="hidden" th:field="*{correo}"    id="hiddenCorreo">
 
                     <div class="mt-4 d-flex gap-2">
-                        <button type="submit" class="btn-accent" id="btnSubmit">
-                            <i class="bi bi-check-lg me-1"></i> Guardar libro
+                        <button type="submit" class="btn-accent">
+                            <i class="bi bi-check-lg me-1"></i> Registrar préstamo
                         </button>
                         <button type="button" class="btn-ghost" id="btnCancelar">
                             Cancelar
@@ -593,48 +610,55 @@
             </div>
         </div>
 
-        <!-- ── Books Table ── -->
+        <!-- ── Prestamos Table ── -->
         <div class="table-card">
 
             <div class="table-card-header">
-                <span class="label">Catálogo de libros</span>
-                <span class="count-badge" th:text="${libros.totalElements} + ' registros'">0 registros</span>
+                <span class="label">Registro de préstamos</span>
+                <span class="count-badge" th:text="${prestamos.totalElements} + ' registros'">0 registros</span>
             </div>
 
             <!-- Empty state -->
-            <div th:if="${libros.content.isEmpty()}" class="empty-state">
-                <i class="bi bi-journal-x empty-icon"></i>
-                <p>No hay libros registrados aún.<br>
-                    <span style="font-size:0.85rem;">Presiona <strong>Nuevo libro</strong> para agregar el primero.</span>
+            <div th:if="${prestamos.content.isEmpty()}" class="empty-state">
+                <i class="bi bi-bookmark-x empty-icon"></i>
+                <p>No hay préstamos registrados aún.<br>
+                    <span style="font-size:0.85rem;">Presiona <strong>Nuevo préstamo</strong> para registrar el primero.</span>
                 </p>
             </div>
 
             <!-- Table -->
-            <div th:if="${!libros.content.isEmpty()}" class="table-responsive">
+            <div th:if="${!prestamos.content.isEmpty()}" class="table-responsive">
                 <table class="table">
                     <thead>
                     <tr>
                         <th style="width: 72px;">ID</th>
-                        <th>Título</th>
-                        <th style="width: 130px;">Año</th>
-                        <th>Autor</th>
+                        <th>Usuario</th>
+                        <th>Libro</th>
+                        <th style="width: 140px;">Fecha</th>
                     </tr>
                     </thead>
                     <tbody>
-                    <tr th:each="libro : ${libros.content}">
+                    <tr th:each="prestamo : ${prestamos.content}">
                         <td>
-                            <span class="id-badge" th:text="${libro.idLibro}">1</span>
-                        </td>
-                        <td th:text="${libro.titulo}">Título</td>
-                        <td>
-                            <span class="year-badge" th:text="${libro.anioPublicacion}">2024</span>
+                            <span class="id-badge" th:text="${prestamo.idPrestamo}">1</span>
                         </td>
                         <td>
-                            <div class="autor-cell">
-                                <div class="autor-avatar"
-                                     th:text="${#strings.substring(libro.autor, 0, 1)}">G</div>
-                                <span th:text="${libro.autor}">Autor</span>
+                            <div class="usuario-cell">
+                                <div class="usuario-avatar"
+                                     th:text="${#strings.substring(prestamo.nombreUsuario, 0, 1)}">U</div>
+                                <span th:text="${prestamo.nombreUsuario}">Usuario</span>
                             </div>
+                        </td>
+                        <td>
+                            <div class="libro-cell">
+                                <div class="libro-icon">
+                                    <i class="bi bi-journal-bookmark"></i>
+                                </div>
+                                <span th:text="${prestamo.tituloLibro}">Título</span>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="date-badge" th:text="${prestamo.fechaPrestamo}">2024-01-01</span>
                         </td>
                     </tr>
                     </tbody>
@@ -647,11 +671,11 @@
                     Página <strong th:text="${currentPage + 1}">1</strong>
                     de <strong th:text="${totalPages}">1</strong>
                 </span>
-                <nav aria-label="Paginación de libros">
+                <nav aria-label="Paginación de préstamos">
                     <ul class="pagination pagination-sm d-flex">
                         <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
                             <a class="page-link"
-                               th:href="@{/libros(page=${currentPage - 1}, size=10)}">
+                               th:href="@{/prestamos(page=${currentPage - 1}, size=10)}">
                                 <i class="bi bi-chevron-left"></i>
                             </a>
                         </li>
@@ -659,12 +683,12 @@
                             th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
                             th:classappend="${i == currentPage} ? 'active'">
                             <a class="page-link"
-                               th:href="@{/libros(page=${i}, size=10)}"
+                               th:href="@{/prestamos(page=${i}, size=10)}"
                                th:text="${i + 1}">1</a>
                         </li>
                         <li class="page-item" th:classappend="${currentPage + 1 >= totalPages} ? 'disabled'">
                             <a class="page-link"
-                               th:href="@{/libros(page=${currentPage + 1}, size=10)}">
+                               th:href="@{/prestamos(page=${currentPage + 1}, size=10)}">
                                 <i class="bi bi-chevron-right"></i>
                             </a>
                         </li>
@@ -723,7 +747,7 @@
     /* ══════════════════════════════════
        FORM — toggle show / hide
     ══════════════════════════════════ */
-    const formEl      = document.getElementById('formCrearLibro');
+    const formEl      = document.getElementById('formCrearPrestamo');
     const btnToggle   = document.getElementById('btnToggleForm');
     const btnCerrar   = document.getElementById('btnCerrarForm');
     const btnCancelar = document.getElementById('btnCancelar');
@@ -746,7 +770,7 @@
             easing: 'easeInQuart',
             complete() {
                 formEl.style.display = 'none';
-                btnToggle.innerHTML  = '<i class="bi bi-plus-lg me-1"></i> Nuevo libro';
+                btnToggle.innerHTML  = '<i class="bi bi-plus-lg me-1"></i> Nuevo préstamo';
             }
         });
     }
@@ -760,29 +784,42 @@
 
 
     /* ══════════════════════════════════
-       AUTOR TOGGLE — existente / nuevo
+       LIBRO — select → hidden field sync
     ══════════════════════════════════ */
-    const pillExistente      = document.getElementById('pillExistente');
-    const pillNuevo          = document.getElementById('pillNuevo');
-    const panelExistente     = document.getElementById('panelAutorExistente');
-    const panelNuevo         = document.getElementById('panelAutorNuevo');
-    const selectAutor        = document.getElementById('selectAutorExistente');
-    const displayNombre      = document.getElementById('displayNombre');
-    const displayApellido    = document.getElementById('displayApellido');
-    const inputNuevoNombre   = document.getElementById('inputNuevoNombre');
-    const inputNuevoApellido = document.getElementById('inputNuevoApellido');
-    const hiddenNombre       = document.getElementById('hiddenNombre');
-    const hiddenApellido     = document.getElementById('hiddenApellido');
-    const btnSubmit          = document.getElementById('btnSubmit');
+    const selectLibro   = document.getElementById('selectLibro');
+    const hiddenIdLibro = document.getElementById('hiddenIdLibro');
 
-    let modoAutor = 'existente'; // 'existente' | 'nuevo'
+    selectLibro.addEventListener('change', () => {
+        hiddenIdLibro.value = selectLibro.value;
+    });
+
+
+    /* ══════════════════════════════════
+       USUARIO TOGGLE — existente / nuevo
+    ══════════════════════════════════ */
+    const pillExistente          = document.getElementById('pillExistente');
+    const pillNuevo              = document.getElementById('pillNuevo');
+    const panelExistente         = document.getElementById('panelUsuarioExistente');
+    const panelNuevo             = document.getElementById('panelUsuarioNuevo');
+    const selectUsuarioExistente = document.getElementById('selectUsuarioExistente');
+    const displayNombre          = document.getElementById('displayNombre');
+    const displayApellido        = document.getElementById('displayApellido');
+    const displayCorreo          = document.getElementById('displayCorreo');
+    const inputNuevoNombre       = document.getElementById('inputNuevoNombre');
+    const inputNuevoApellido     = document.getElementById('inputNuevoApellido');
+    const inputNuevoCorreo       = document.getElementById('inputNuevoCorreo');
+    const hiddenIdUsuario        = document.getElementById('hiddenIdUsuario');
+    const hiddenNombre           = document.getElementById('hiddenNombre');
+    const hiddenApellido         = document.getElementById('hiddenApellido');
+    const hiddenCorreo           = document.getElementById('hiddenCorreo');
+
+    let modoUsuario = 'existente';
 
     function switchToExistente() {
-        modoAutor = 'existente';
+        modoUsuario = 'existente';
         pillExistente.classList.add('active');
         pillNuevo.classList.remove('active');
 
-        // Ocultar panel nuevo
         anime({
             targets: panelNuevo,
             opacity: 0,
@@ -792,24 +829,23 @@
             complete() { panelNuevo.style.display = 'none'; }
         });
 
-        // Mostrar panel existente
         panelExistente.style.display = 'block';
         anime({ targets: panelExistente, opacity: [0, 1], duration: 280, easing: 'easeOutQuart' });
 
         // Limpiar campos nuevo
         inputNuevoNombre.value   = '';
         inputNuevoApellido.value = '';
+        inputNuevoCorreo.value   = '';
 
         // Replicar selección actual del select (si hay)
         syncFromSelect();
     }
 
     function switchToNuevo() {
-        modoAutor = 'nuevo';
+        modoUsuario = 'nuevo';
         pillNuevo.classList.add('active');
         pillExistente.classList.remove('active');
 
-        // Ocultar panel existente
         anime({
             targets: panelExistente,
             opacity: 0,
@@ -819,60 +855,91 @@
             complete() { panelExistente.style.display = 'none'; }
         });
 
-        // Mostrar panel nuevo
         panelNuevo.style.display = 'block';
         anime({ targets: panelNuevo, opacity: [0, 1], duration: 280, easing: 'easeOutQuart' });
 
-        // Limpiar campos existente
-        selectAutor.value    = '';
-        displayNombre.value  = '';
-        displayApellido.value = '';
-        hiddenNombre.value   = '';
-        hiddenApellido.value = '';
+        // Limpiar campos existente y vaciar hidden idUsuario
+        selectUsuarioExistente.value = '';
+        displayNombre.value          = '';
+        displayApellido.value        = '';
+        displayCorreo.value          = '';
+        hiddenIdUsuario.value        = '';
+        hiddenNombre.value           = '';
+        hiddenApellido.value         = '';
+        hiddenCorreo.value           = '';
     }
 
     function syncFromSelect() {
-        const opt = selectAutor.options[selectAutor.selectedIndex];
+        const opt = selectUsuarioExistente.options[selectUsuarioExistente.selectedIndex];
         if (opt && opt.value) {
-            const nombre   = opt.dataset.nombre   || '';
-            const apellido = opt.dataset.apellido || '';
-            displayNombre.value  = nombre;
-            displayApellido.value = apellido;
-            hiddenNombre.value   = nombre;
-            hiddenApellido.value = apellido;
+            displayNombre.value   = opt.dataset.nombre   || '';
+            displayApellido.value = opt.dataset.apellido || '';
+            displayCorreo.value   = opt.dataset.correo   || '';
+            hiddenIdUsuario.value = opt.value;
+            hiddenNombre.value    = opt.dataset.nombre   || '';
+            hiddenApellido.value  = opt.dataset.apellido || '';
+            hiddenCorreo.value    = opt.dataset.correo   || '';
         } else {
-            displayNombre.value  = '';
+            displayNombre.value   = '';
             displayApellido.value = '';
-            hiddenNombre.value   = '';
-            hiddenApellido.value = '';
+            displayCorreo.value   = '';
+            hiddenIdUsuario.value = '';
+            hiddenNombre.value    = '';
+            hiddenApellido.value  = '';
+            hiddenCorreo.value    = '';
         }
     }
 
     // Sincronizar hidden fields en tiempo real desde "nuevo"
-    inputNuevoNombre.addEventListener('input', () => {
-        hiddenNombre.value = inputNuevoNombre.value;
-    });
+    inputNuevoNombre.addEventListener('input',   () => { hiddenNombre.value   = inputNuevoNombre.value; });
+    inputNuevoApellido.addEventListener('input', () => { hiddenApellido.value = inputNuevoApellido.value; });
+    inputNuevoCorreo.addEventListener('input',   () => { hiddenCorreo.value   = inputNuevoCorreo.value; });
 
-    inputNuevoApellido.addEventListener('input', () => {
-        hiddenApellido.value = inputNuevoApellido.value;
-    });
-
-    selectAutor.addEventListener('change', syncFromSelect);
+    selectUsuarioExistente.addEventListener('change', syncFromSelect);
 
     pillExistente.addEventListener('click', switchToExistente);
-    pillNuevo.addEventListener('click', switchToNuevo);
+    pillNuevo.addEventListener('click',     switchToNuevo);
 
-    // Validación antes de submit
+
+    /* ══════════════════════════════════
+       FORM — submit validation
+    ══════════════════════════════════ */
     document.querySelector('form').addEventListener('submit', (e) => {
-        if (!hiddenNombre.value.trim() || !hiddenApellido.value.trim()) {
+        // Validar libro seleccionado
+        if (!hiddenIdLibro.value) {
             e.preventDefault();
-            // Highlight autor section
             anime({
-                targets: '.autor-toggle',
+                targets: '#selectLibro',
                 translateX: [-6, 6, -4, 4, 0],
                 duration: 400,
                 easing: 'easeInOutSine'
             });
+            return;
+        }
+
+        // Validar usuario existente seleccionado
+        if (modoUsuario === 'existente' && !hiddenIdUsuario.value) {
+            e.preventDefault();
+            anime({
+                targets: '.usuario-toggle',
+                translateX: [-6, 6, -4, 4, 0],
+                duration: 400,
+                easing: 'easeInOutSine'
+            });
+            return;
+        }
+
+        // Validar campos de usuario nuevo
+        if (modoUsuario === 'nuevo') {
+            if (!hiddenNombre.value.trim() || !hiddenApellido.value.trim() || !hiddenCorreo.value.trim()) {
+                e.preventDefault();
+                anime({
+                    targets: '.usuario-toggle',
+                    translateX: [-6, 6, -4, 4, 0],
+                    duration: 400,
+                    easing: 'easeInOutSine'
+                });
+            }
         }
     });
 

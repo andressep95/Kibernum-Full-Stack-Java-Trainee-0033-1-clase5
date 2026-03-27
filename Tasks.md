@@ -28,6 +28,9 @@
 ### Registrar Prestamos
 
 - Escenario 1: Prestamo normal.
+  - Usuarios
+  - Libros disponibles.
+  - Autores registrados (Se obtiene por defecto al registrar el libro).
 
 ---
 

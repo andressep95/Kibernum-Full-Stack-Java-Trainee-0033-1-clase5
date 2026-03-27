@@ -101,10 +101,14 @@ Se introdujo el patrón **DTO** para desacoplar las entidades JPA de la capa de 
 | `ListAutorDTO` | Servicio → Vista | Expone id, nombre y apellido para el listado de autores |
 | `CreateAutorConLibroDTO` | Formulario → Servicio | Recibe nombre, apellido y una lista opcional de `CreateLibroSinAutorDTO` |
 | `CreateLibroSinAutorDTO` | Anidado en `CreateAutorConLibroDTO` | Transporta título y año de publicación de un libro al crear un autor |
+| `CreatePrestamoDTO` | Formulario → Servicio | Recibe `idLibro` y, según el modo, `idUsuario` (existente) o nombre/apellido/correo (nuevo) |
+| `ListPrestamosDTO` | Servicio → Vista | Expone id del préstamo, nombre completo del usuario, título del libro y fecha |
 
 > **Nota sobre anidamiento:** `CreateLibroDTO` contiene un `CreateAutorDTO` como campo. Esto modela la relación del formulario: al crear un libro siempre se especifica un autor, ya sea existente o nuevo. Spring MVC enlaza los campos anidados usando notación de punto (`autor.nombre`, `autor.apellido`).
 
 > **Nota sobre colecciones en DTOs:** `CreateAutorConLibroDTO` usa `List<CreateLibroSinAutorDTO>` (no `Set`) porque Spring MVC requiere una colección indexable para hacer binding desde inputs HTML con notación `libros[0].titulo`, `libros[1].titulo`, etc. Un `Set` no tiene índice definido y no puede recibir este tipo de binding.
+
+> **Nota sobre DTO de préstamo con modo dual:** `CreatePrestamoDTO` tiene dos rutas posibles. Si `idUsuario` no es nulo, el servicio busca al usuario por ID (modo existente). Si es nulo, utiliza nombre, apellido y correo para crear un usuario nuevo en la misma transacción. Este diseño permite que un solo DTO y un solo endpoint soporten ambos flujos sin necesidad de dos formularios o dos rutas distintas.
 
 ### 8. Capa de servicios
 
@@ -162,6 +166,42 @@ El servicio también expone dos variantes de listado:
 - `obtenerAutores()` — retorna `List<ListAutorDTO>`, usada por el desplegable de `LibroController`.
 - `obtenerAutoresPaginado(page, size)` — retorna `Page<ListAutorDTO>`, usada por la vista de autores.
 
+#### Lógica de negocio destacada en `PrestamoServiceImpl`
+
+Al registrar un préstamo, el servicio resuelve el usuario antes de persistir. El campo `idUsuario` en el DTO actúa como discriminador:
+
+```java
+private Usuario crearUsuarioPrestamo(CreatePrestamoDTO dto) {
+    if (dto.getIdUsuario() != null) {
+        // Modo existente: busca por ID
+        return usuarioRepository.findById(dto.getIdUsuario())
+            .orElseThrow(() -> new IllegalArgumentException("El usuario no existe"));
+    }
+    // Modo nuevo: valida correo único y persiste
+    if (usuarioRepository.existsByCorreo(dto.getCorreo())) {
+        throw new IllegalArgumentException("El correo ya está registrado");
+    }
+    Usuario usuario = new Usuario();
+    usuario.setNombre(dto.getNombre());
+    usuario.setApellido(dto.getApellido());
+    usuario.setCorreo(dto.getCorreo());
+    return usuarioRepository.save(usuario);
+}
+```
+
+El controlador no distingue entre ambos modos; la decisión es exclusiva del servicio.
+
+#### Métodos de listado sin paginación para desplegables
+
+`LibroService` y `UsuarioService` exponen métodos que retornan `List<T>` (sin paginar) para poblar los `<select>` de los formularios:
+
+```java
+List<ListLibroDTO>   obtenerTodosLosLibros();    // LibroService
+List<ListUsuarioDTO> obtenerTodosLosUsuarios();  // UsuarioService
+```
+
+Estos métodos conviven con sus variantes paginadas (`obtenerLibros`, `listarUsuarios`) que usan `Page<T>` para las tablas de listado. La distinción es intencionada: un dropdown necesita todos los registros a la vez, mientras que una tabla pagina para no saturar la vista.
+
 #### Validaciones en el servicio
 
 Las validaciones de negocio (campos obligatorios, correo duplicado) se lanzaron como `IllegalArgumentException` dentro del servicio. El controlador las captura y las redirige a la vista como mensajes de error:
@@ -182,7 +222,7 @@ try {
 
 ### 9. Capa de controladores (Spring MVC)
 
-Se implementaron tres controladores siguiendo el patrón **MVC** de Spring:
+Se implementaron cuatro controladores siguiendo el patrón **MVC** de Spring:
 
 #### `UsuarioController` — mapeado en `"/"`
 
@@ -204,6 +244,15 @@ Se implementaron tres controladores siguiendo el patrón **MVC** de Spring:
 |---|---|---|
 | `@GetMapping` | `/autores` | Carga autores paginados y retorna la vista `autores` |
 | `@PostMapping` | `/autores` | Recibe el formulario de autor (con o sin libros), crea y redirige |
+
+#### `PrestamoController` — mapeado en `"/prestamos"`
+
+| Método | Ruta | Acción |
+|---|---|---|
+| `@GetMapping` | `/prestamos` | Carga préstamos paginados + todos los libros y usuarios para los dropdowns, retorna vista `prestamos` |
+| `@PostMapping` | `/prestamos` | Recibe el formulario de préstamo (usuario existente o nuevo), crea y redirige |
+
+El `GET` carga simultáneamente tres colecciones en el modelo: la página de préstamos y las listas completas de libros y usuarios. Estas últimas poblán los `<select>` del formulario y no requieren paginación.
 
 #### Conceptos clave aplicados
 
@@ -229,25 +278,26 @@ model.addAttribute("totalPages", usuarios.getTotalPages());
 Los controladores nunca retornan una vista directamente después de un POST. En su lugar redirigen con `redirect:/ruta`. Esto evita que el navegador reenvíe el formulario al refrescar la página.
 
 ```
-POST /usuarios  →  procesa  →  redirect:/  →  GET /  →  vista
+POST /prestamos  →  procesa  →  redirect:/prestamos  →  GET /prestamos  →  vista
 ```
 
 Los mensajes de éxito/error se transmiten entre el POST y el GET usando **Flash Attributes**, que sobreviven a la redirección y se eliminan automáticamente después de ser leídos:
 
 ```java
-redirectAttributes.addFlashAttribute("successMessage", "Usuario creado exitosamente.");
-return "redirect:/";
+redirectAttributes.addFlashAttribute("successMessage", "Préstamo registrado exitosamente.");
+return "redirect:/prestamos";
 ```
 
 ### 10. Capa de vistas (Thymeleaf + Bootstrap + Anime.js)
 
-Se implementaron tres vistas HTML bajo `src/main/resources/templates/`:
+Se implementaron cuatro vistas HTML bajo `src/main/resources/templates/`:
 
 | Archivo | Ruta | Descripción |
 |---|---|---|
 | `index.html` | `/` | Listado de usuarios con formulario de creación |
 | `libros.html` | `/libros` | Listado de libros con formulario de creación |
 | `autores.html` | `/autores` | Listado de autores con formulario de creación (con o sin libros) |
+| `prestamos.html` | `/prestamos` | Listado de préstamos con formulario de creación (usuario existente o nuevo) |
 
 #### Enlace formulario ↔ controlador en Thymeleaf
 
@@ -307,7 +357,7 @@ anime({
 });
 ```
 
-Los ítems del sidebar sin ruta implementada tienen clase `soon` (`pointer-events: none`, opacidad reducida) y un badge "Pronto" que aparece al expandir.
+Los ítems del sidebar sin ruta implementada tienen clase `soon` (`pointer-events: none`, opacidad reducida) y un badge "Pronto" que aparece al expandir. A medida que se implementan nuevas vistas, el ítem correspondiente pasa de `.soon` a un enlace funcional con `.active` en la vista que le pertenece.
 
 #### Formulario oculto con toggle animado
 
@@ -328,7 +378,7 @@ const hasError = document.querySelector('.alert-danger');
 if (hasError) showForm();
 ```
 
-#### Toggle autor existente / autor nuevo (solo libros)
+#### Toggle autor existente / autor nuevo (libros)
 
 El formulario de libros ofrece dos modos para especificar el autor:
 
@@ -336,6 +386,24 @@ El formulario de libros ofrece dos modos para especificar el autor:
 - **Autor nuevo**: muestra inputs de texto que sincronizan en tiempo real los mismos hidden inputs.
 
 En ambos casos el servidor recibe `autor.nombre` y `autor.apellido`. La lógica de si es autor nuevo o existente reside enteramente en `LibroServiceImpl`.
+
+#### Toggle usuario existente / usuario nuevo (préstamos)
+
+El formulario de préstamos aplica el mismo patrón de toggle pills para el usuario:
+
+- **Usuario existente**: muestra un `<select>` con todos los usuarios de la BD. Al seleccionar, el JS copia `data-nombre`, `data-apellido` y `data-correo` a los hidden inputs, y también escribe `idUsuario`.
+- **Usuario nuevo**: muestra inputs de texto (nombre, apellido, correo). El JS sincroniza en tiempo real a los hidden inputs. El hidden `idUsuario` queda vacío, lo que el servicio interpreta como señal para crear un nuevo usuario.
+
+```javascript
+// Modo existente: escribe idUsuario + datos del usuario
+hiddenIdUsuario.value = opt.value;
+hiddenNombre.value    = opt.dataset.nombre;
+
+// Modo nuevo: limpia idUsuario para que el servicio cree uno nuevo
+hiddenIdUsuario.value = '';
+```
+
+Al cambiar de panel, Anime.js anima la transición (fade + colapso de altura con `easeInQuart` para ocultar, `easeOutQuart` para mostrar). La validación previa al submit verifica que los hidden fields tengan valor antes de dejar pasar el formulario; si no, ejecuta una animación de shake sobre los toggle pills.
 
 #### Binding dinámico de colecciones indexadas (vista de autores)
 
@@ -373,7 +441,7 @@ El archivo `Tasks.md` define los escenarios de uso que guían el desarrollo futu
 - ✅ Registro de usuarios
 - ✅ Registro de libros (con autor nuevo o existente)
 - ✅ Registro de autores (con o sin libros asociados)
-- ⬜ Registro de préstamos
+- ✅ Registro de préstamos (con usuario existente o nuevo)
 - ⬜ Consultas de libros por autor, año, título, disponibilidad
 - ⬜ Consultas de autores por nombre, libro o ranking de préstamos
 - ⬜ Consultas de usuarios y préstamos
@@ -409,7 +477,8 @@ biblioteca/
 │       │   ├── controller/
 │       │   │   ├── UsuarioController.java      ← GET / y POST /
 │       │   │   ├── LibroController.java        ← GET /libros y POST /libros
-│       │   │   └── AutorController.java        ← GET /autores y POST /autores
+│       │   │   ├── AutorController.java        ← GET /autores y POST /autores
+│       │   │   └── PrestamoController.java     ← GET /prestamos y POST /prestamos
 │       │   ├── dto/
 │       │   │   ├── CreateUsuarioDTO.java
 │       │   │   ├── ListUsuarioDTO.java
@@ -418,7 +487,9 @@ biblioteca/
 │       │   │   ├── CreateAutorDTO.java
 │       │   │   ├── ListAutorDTO.java
 │       │   │   ├── CreateAutorConLibroDTO.java
-│       │   │   └── CreateLibroSinAutorDTO.java
+│       │   │   ├── CreateLibroSinAutorDTO.java
+│       │   │   ├── CreatePrestamoDTO.java
+│       │   │   └── ListPrestamosDTO.java
 │       │   ├── model/
 │       │   │   ├── Autor.java
 │       │   │   ├── Libro.java
@@ -432,17 +503,20 @@ biblioteca/
 │       │   └── service/
 │       │       ├── AutorService.java
 │       │       ├── LibroService.java
+│       │       ├── PrestamoService.java
 │       │       ├── UsuarioService.java
 │       │       └── impl/
 │       │           ├── AutorServiceImpl.java
 │       │           ├── LibroServiceImpl.java
+│       │           ├── PrestamoServiceImpl.java
 │       │           └── UsuarioServiceImpl.java
 │       └── resources/
 │           ├── application.properties
 │           └── templates/
 │               ├── index.html                  ← Vista de usuarios (/)
 │               ├── libros.html                 ← Vista de libros (/libros)
-│               └── autores.html                ← Vista de autores (/autores)
+│               ├── autores.html                ← Vista de autores (/autores)
+│               └── prestamos.html              ← Vista de préstamos (/prestamos)
 ├── sql/
 │   ├── init.sql
 │   └── postgres.sql
@@ -469,6 +543,8 @@ Este proyecto es una actividad de aprendizaje orientada a practicar:
 - Uso de DTOs para desacoplar la presentación de las entidades JPA.
 - Validaciones de negocio con excepciones controladas.
 - Lógica de upsert (crear o reutilizar) a nivel de servicio.
+- DTOs con modo dual: un mismo DTO soporta dos flujos (usuario existente vs. nuevo) según qué campos estén presentes.
+- Distinción entre métodos de listado paginado (`Page<T>`) para tablas y sin paginar (`List<T>`) para desplegables.
 
 **Capa web:**
 - Patrón MVC con Spring Web y Thymeleaf.
@@ -479,6 +555,8 @@ Este proyecto es una actividad de aprendizaje orientada a practicar:
 
 **Frontend:**
 - Layouts responsivos con Bootstrap 5.
-- Animaciones declarativas con Anime.js (sidebar, formularios, alertas).
+- Animaciones declarativas con Anime.js (sidebar, formularios, alertas, transiciones de panel).
 - Sincronización de campos de formulario mediante JavaScript vanilla.
 - Binding dinámico de colecciones con inputs indexados (`name="libros[i].campo"`) y re-indexado del DOM al eliminar filas.
+- Toggle pills animados para alternar entre modos de formulario (existente / nuevo).
+- Validación client-side con animación de shake antes de enviar el formulario al servidor.

@@ -88,6 +88,21 @@ public class LibroServiceImpl implements LibroService {
         return new PageImpl<>(listaDto, pageable, librosPage.getTotalElements());
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<ListLibroDTO> obtenerTodosLosLibros() {
+        return libroRepository.findAll().stream()
+            .map(libro -> {
+                ListLibroDTO dto = new ListLibroDTO();
+                dto.setIdLibro(libro.getIdLibro());
+                dto.setTitulo(libro.getTitulo());
+                dto.setAnioPublicacion(String.valueOf(libro.getAnioPublicacion()));
+                dto.setAutor(libro.getIdAutor().getNombre() + " " + libro.getIdAutor().getApellido());
+                return dto;
+            })
+            .toList();
+    }
+
     private void validarCrearLibro(CreateLibroDTO createLibroDTO) {
         if (createLibroDTO.getTitulo() == null || createLibroDTO.getTitulo().isEmpty()) {
             throw new IllegalArgumentException("El título del libro no puede ser nulo o vacío");

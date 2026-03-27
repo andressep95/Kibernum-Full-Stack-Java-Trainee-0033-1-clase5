@@ -1,13 +1,16 @@
 package cl.playground.biblioteca.service.impl;
 
-import cl.playground.biblioteca.dto.CreateAutorConLibroDTO;
-import cl.playground.biblioteca.dto.CreateLibroSinAutorDTO;
-import cl.playground.biblioteca.dto.ListAutorDTO;
+import cl.playground.biblioteca.dto.*;
 import cl.playground.biblioteca.model.Autor;
 import cl.playground.biblioteca.model.Libro;
+import cl.playground.biblioteca.model.Prestamo;
+import cl.playground.biblioteca.model.Usuario;
 import cl.playground.biblioteca.repository.AutorRepository;
 import cl.playground.biblioteca.repository.LibroRepository;
+import cl.playground.biblioteca.repository.PrestamoRepository;
+import cl.playground.biblioteca.repository.UsuarioRepository;
 import cl.playground.biblioteca.service.AutorService;
+import cl.playground.biblioteca.service.PrestamoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -16,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service

@@ -11,6 +11,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -62,6 +63,21 @@ public class UsuarioServiceImpl implements UsuarioService {
             .toList();
 
         return new PageImpl<>(listaDto, pageable, usuariosPage.getTotalElements());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ListUsuarioDTO> obtenerTodosLosUsuarios() {
+        return usuarioRepository.findAll().stream()
+            .map(usuario -> {
+                ListUsuarioDTO dto = new ListUsuarioDTO();
+                dto.setIdUsuario(usuario.getIdUsuario());
+                dto.setNombre(usuario.getNombre());
+                dto.setApellido(usuario.getApellido());
+                dto.setCorreo(usuario.getCorreo());
+                return dto;
+            })
+            .toList();
     }
 
     private void validarUsuarioNuevo(CreateUsuarioDTO createUsuarioDTO) {
